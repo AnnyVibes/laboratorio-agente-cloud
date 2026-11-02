@@ -1,5 +1,5 @@
 import unittest
-from tasks import agregar_tarea, completar_tarea, pendientes
+from tasks import agregar_tarea, completar_tarea, eliminar_tarea, pendientes
 
 class TestTasks(unittest.TestCase):
     def test_agregar_tarea(self):
@@ -57,6 +57,35 @@ class TestTasks(unittest.TestCase):
         agregar_tarea(tareas, "Leer", "Estudio")
         agregar_tarea(tareas, "Ordenar")
         self.assertEqual(pendientes(tareas, "   "), [])
+
+    def test_eliminar_tarea_existente(self):
+        tareas = []
+        agregar_tarea(tareas, "Leer")
+        segunda = agregar_tarea(tareas, "Escribir")
+        agregar_tarea(tareas, "Repasar")
+        eliminada = eliminar_tarea(tareas, 2)
+        self.assertEqual(eliminada, segunda)
+        self.assertEqual([t["id"] for t in tareas], [1, 3])
+
+    def test_eliminar_tarea_inexistente(self):
+        tareas = []
+        agregar_tarea(tareas, "Leer")
+        agregar_tarea(tareas, "Escribir")
+        copia = [dict(t) for t in tareas]
+        with self.assertRaises(ValueError) as contexto:
+            eliminar_tarea(tareas, 99)
+        self.assertEqual(str(contexto.exception), "Tarea no encontrada")
+        self.assertEqual(tareas, copia)
+
+    def test_agregar_despues_de_eliminar_no_repite_id(self):
+        tareas = []
+        agregar_tarea(tareas, "Leer")
+        agregar_tarea(tareas, "Escribir")
+        eliminar_tarea(tareas, 1)
+        nueva = agregar_tarea(tareas, "Repasar")
+        ids = [t["id"] for t in tareas]
+        self.assertEqual(len(ids), len(set(ids)))
+        self.assertEqual(nueva["id"], 3)
 
 if __name__ == "__main__":
     unittest.main()
