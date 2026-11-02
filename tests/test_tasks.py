@@ -52,5 +52,11 @@ class TestTasks(unittest.TestCase):
         agregar_tarea(tareas, "Leer", "Estudio")
         self.assertEqual(pendientes(tareas, "Trabajo"), [])
 
+    def test_pendientes_categoria_solo_espacios_devuelve_vacio(self):
+        tareas = []
+        agregar_tarea(tareas, "Leer", "Estudio")
+        agregar_tarea(tareas, "Ordenar")
+        self.assertEqual(pendientes(tareas, "   "), [])
+
 if __name__ == "__main__":
     unittest.main()
